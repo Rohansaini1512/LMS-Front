@@ -1,23 +1,17 @@
-# Use the official Node.js image as the base image
-FROM node:18
+# Use the official Nginx image as the base image
+FROM nginx:latest
 
-# Set the working directory in the container
-WORKDIR /app
+# Set the working directory to /usr/share/nginx/html
+WORKDIR /usr/share/nginx/html
 
-# Copy package.json and package-lock.json files
-COPY package*.json ./
+# Remove the default Nginx static files
+RUN rm -rf ./*
 
-# Install dependencies
-RUN npm install
+# Copy the build output from your React app to the Nginx html directory
+COPY build/ /usr/share/nginx/html/
 
-# Copy the rest of the application code
-COPY . .
+# Expose port 80 for web traffic
+EXPOSE 80
 
-# Build the React application
-RUN npm run build
-
-# Expose the port that the app will run on
-EXPOSE 3000
-
-# Command to start the app
-CMD ["npm", "run", "dev"]
+# Start Nginx when the container launches
+CMD ["nginx", "-g", "daemon off;"]
